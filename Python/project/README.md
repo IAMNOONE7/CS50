@@ -1,5 +1,4 @@
 # Daily Stock News
-#### Video Demo:  <https://www.youtube.com/watch?v=bduVWEXeGPw>
 #### Description:
 This project is Python-based stock analysis tool that help identify potential trading opportunity by comparing current stock prices against historical medians and moving averages.
 The program imports stock data, processes it into and Excel table and calculates various metrics such as percent changes, medians, moving averages and rankings.
