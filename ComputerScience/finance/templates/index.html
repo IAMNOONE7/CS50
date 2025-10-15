@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Portfolio
+{% endblock %}
+
+{% block main %}
+
+<h2>Portfolio</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Symbol</th>
+            <th>Name</th>
+            <th>Shares</th>
+            <th>Price</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in positions %}
+            <tr>
+                <td>{{p.symbol}}</td>
+                <td>{{p.name}}</td>
+                <td>{{p.shares}}</td>
+                <td>{{p.price | usd}}</td>
+                <td>{{p.value | usd}}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="4" style = "text-align:right;">Cash</td><td>{{cash | usd}}</td>
+        </tr>
+        <tr>
+            <td colspan="4" style = "text-align:right;"><strong>Total</strong></td><td><strong>{{total | usd}}</strong></td>
+        </tr>
+    </tfoot>
+</table>
+{% endblock %}

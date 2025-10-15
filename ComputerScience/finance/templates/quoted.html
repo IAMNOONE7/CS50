@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log In
+{% endblock %}
+
+{% block main %}
+<p> {{quote.name}} ({{quote.symbol}}) - {{quote.price | usd}}</p>
+<a href = "/quote">Back</a>
+{% endblock %}

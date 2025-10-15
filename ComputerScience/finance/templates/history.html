@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log In
+{% endblock %}
+
+{% block main %}
+<h2>History</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Time</th>
+            <th>Symbol</th>
+            <th>Shares</th>
+            <th>Price</th>
+        </tr>
+    </thead>
+     <tbody>
+        {% for r in rows %}
+            <tr>
+                <td>{{r.tsl}}</td>
+                <td>{{r.symbol}}</td>
+                <td>{{r.shares}}</td>
+                <td>{{r.price | usd}}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

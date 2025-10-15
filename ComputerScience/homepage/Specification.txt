@@ -1,0 +1,33 @@
+HTML TAGS USED
+
+html, head, body, title, header, nav, main, section, article, footer, h1, h2, h3, p, a, img, button, form, input, textarea, small, div
+
+
+Selectors:
+- Tag selector
+- Class selector
+- ID selector
+- Attribute selector
+
+
+CSS:
+- line-height
+- font-size
+- margin
+- border
+- background
+- color
+
+
+Bootstrap:
+- navigation bar
+- grid system
+- buttons
+- cards and jumbotron
+
+JS:
+- live clock
+- dark mode toggle
+
+Bootstrap provides structure and responsive layout.
+Javascript adds interactivuty - a live clock and dark mode toggle.

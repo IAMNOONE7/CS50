@@ -1,0 +1,13 @@
+sort1 uses: Bubble Sort
+
+How do you know?: quadratic on random and reversed. But fast on sorted - early exit
+
+sort2 uses: Merge Sort
+
+How do you know?: Random - Growth around x2 then x16, which looks like n log n
+
+sort3 uses: Selection Sort
+
+How do you know?: times for 50k are very similar - same amount of work
+
+

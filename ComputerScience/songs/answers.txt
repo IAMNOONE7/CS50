@@ -1,0 +1,3 @@
+- Using average on energy and danceability of every songs -> energetic/slow/happy/chill...
+
+- Weigh songs by listening duration, frequency and how recently he plays what songs

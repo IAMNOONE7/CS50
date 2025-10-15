@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block title %}Trade{% endblock %}
+{% block main %}
+<h4>Trade</h4>
+<form action = "/trade" method = "post" class = "row">
+  <div class="form-group col-md-3">
+    <label>Symbol</label>
+    <input name="symbol" class="form-control" placeholder="AAPL" autofocus>
+  </div>
+  <div class="form-group col-md-3">
+    <label>Side</label>
+    <select name="side" class="form-control">
+        <option value="buy">Buy</option>
+        <option value="sell">Sell</option>
+    </select>
+  </div>
+  <div class="form-group col-md-3">
+    <label>Shares</label>
+    <input name="shares" type="number" min="1" step="1" class="form-control">
+  </div>
+  <div class="form-group col-md-3">
+    <label>Price</label>
+    <div class="input-group">
+        <input name="price" type="number" step="0.01" class="form-control" placeholder="optional if Live">
+        <div class="input-group-append">
+        <div class="input-group-text">
+          <input type="checkbox" name="use_live" value="1" checked> &nbsp;Live
+        </div>
+      </div>
+    </div>
+    <small class="form-text text-muted">Checked = use live Yahoo price.</small>
+  </div>
+   <div class="col-12">
+    <button class="btn btn-primary">Submit</button>
+    <a href="/positions" class="btn btn-light">Cancel</a>
+  </div>
+</form>
+
+{% endblock %}

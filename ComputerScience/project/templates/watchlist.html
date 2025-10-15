@@ -1,0 +1,96 @@
+{% extends "layout.html" %}
+{% block title %}Watchlist{% endblock %}
+{% block main %}
+<h4 class="mb-3">Watchlist</h4>
+<form method="post" class="form-inline mb-3">
+     <input name="symbol" list="tickers" class="form-control mr-2" placeholder="Add symbol (e.g., AAPL)" required>
+     <button class="btn btn-primary">Add</button>
+</form>
+<datalist id="tickers"></datalist>
+
+<div class="table-responsive">
+    <table class="table table-sm align-middle">
+        <thead>
+            <tr>
+                <th>Symbol</th><th>Name</th>
+                <th class="text-right">Last</th>
+                <th class="text-right">Δ</th>
+                <th class="text-right">Δ%</th>
+            </tr>
+        </thead>
+        <tbody id="wlBody">
+            {% for s in symbols %}
+            <tr data-s="{{s}}">
+                <td><a href="/symbol/{{s}}">{{s}}</a></td>
+                <td class="name text-truncate" style="max-width:260px">…</td>
+                <td class="last text-right">–</td>
+                <td class="chg  text-right">–</td>
+                <td class="pct  text-right">–</td>
+                <td class="text-right">
+                    <form method="post" class="m-0 p-0 d-inline">
+                        <input type = "hidden" name = "symbol" value = "{{s}}">
+                        <button name="remove" value="1" class="btn btn-link btn-sm text-danger">remove</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+(async () => {
+  try {
+    const r = await fetch('/static/companies.json');
+    if (r.ok) {
+      const arr = await r.json();
+      const dl = document.getElementById('tickers');
+      arr.slice(0, 2000).forEach(x => {
+        const o = document.createElement('option');
+        o.value = x.symbol;
+        o.label = x.name || x.symbol;
+        dl.appendChild(o);
+      });
+    }
+  } catch {}
+  const symbols = [...document.querySelectorAll('#wlBody tr[data-s]')]
+    .map(tr => String(tr.dataset.s).toUpperCase());
+
+  function fmt2(n) { return Number.isFinite(n) ? n.toFixed(2) : '–'; }
+
+  async function refresh() {
+    if (!symbols.length) return;
+
+    const url = '/api/quotes?symbols=' + encodeURIComponent(symbols.join(',')) + '&_=' + Date.now();
+    const r = await fetch(url);
+    if (!r.ok) return;
+    const j = await r.json();
+    const by = Object.fromEntries((j.data || []).map(d => [String(d.symbol).toUpperCase(), d]));
+
+    document.querySelectorAll('#wlBody tr[data-s]').forEach(tr => {
+      const s = String(tr.dataset.s).toUpperCase();
+      const d = by[s] || {};
+
+      tr.querySelector('.name').textContent = d.name || '';
+      tr.querySelector('.last').textContent = fmt2(d.last);
+
+      const chg = d.chg, pct = d.pct;
+      const chgCell = tr.querySelector('.chg'), pctCell = tr.querySelector('.pct');
+
+      chgCell.textContent = Number.isFinite(chg) ? (chg >= 0 ? '+' : '') + chg.toFixed(2) : '–';
+      pctCell.textContent = Number.isFinite(pct) ? (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%' : '–';
+
+      chgCell.classList.toggle('text-success', Number.isFinite(chg) && chg > 0);
+      chgCell.classList.toggle('text-danger',  Number.isFinite(chg) && chg < 0);
+      pctCell.classList.toggle('text-success', Number.isFinite(pct) && pct > 0);
+      pctCell.classList.toggle('text-danger',  Number.isFinite(pct) && pct < 0);
+    });
+  }
+
+  refresh();
+  setInterval(refresh, 15000);
+})();
+</script>
+
+
+{% endblock %}

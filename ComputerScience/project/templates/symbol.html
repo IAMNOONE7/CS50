@@ -1,0 +1,120 @@
+{% extends "layout.html" %}
+{% block title %}{{ symbol }}{% endblock %}
+{% block main %}
+
+<div class="d-flex align-items-center justify-content-between mb-2">
+  <div>
+    <h4 class="mb-1">{{ symbol }}</h4>
+    <div id="quoteBox" class="small text-muted">Loading quote…</div>
+  </div>
+
+  <div id="rangeBar" class="btn-group btn-group-sm" role="group" aria-label="Ranges">
+    <button type="button" class="btn btn-outline-secondary" data-range="1D">1D</button>
+    <button type="button" class="btn btn-outline-secondary" data-range="5D">5D</button>
+    <button type="button" class="btn btn-outline-secondary" data-range="Week">Week</button>
+    <button type="button" class="btn btn-outline-secondary active" data-range="Month">Month</button>
+    <button type="button" class="btn btn-outline-secondary" data-range="3M">3M</button>
+    <button type="button" class="btn btn-outline-secondary" data-range="YTD">YTD</button>
+    <button type="button" class="btn btn-outline-secondary" data-range="5Y">5Y</button>
+  </div>
+</div>
+
+<div class="position-relative">
+  <div id="chart"
+       data-symbol="{{ symbol }}"
+       data-markers='{{ markers | tojson }}'
+       style="height:420px; width:100%;"></div>
+  <div id="chartLoading" class="chart-loading d-none">Loading…</div>
+</div>
+
+<h6 class="mt-4">Your trades</h6>
+<ul class="mb-0">
+  {% for t in trades %}
+    <li>
+      {{ t.executed_at }} – {% if t.shares > 0 %}Buy{% else %}Sell{% endif %}
+      {{ t.shares | abs }} @ {{ t.price | usd }}
+    </li>
+  {% endfor %}
+</ul>
+
+<script src="https://unpkg.com/lightweight-charts@4.2.1/dist/lightweight-charts.standalone.production.js"></script>
+<script>
+(() => {
+  const el = document.getElementById('chart');
+  const loading = document.getElementById('chartLoading');
+  const symbol = el.dataset.symbol;
+  const markers = JSON.parse(el.dataset.markers || '[]');
+  const quoteBox = document.getElementById('quoteBox');
+  const rangeBar = document.getElementById('rangeBar');
+
+  const chart = LightweightCharts.createChart(el, {
+    width:  el.clientWidth || 600,
+    height: el.clientHeight || 420,
+    layout: { background: { color: '#ffffff' }, textColor: '#333' },
+    rightPriceScale: { borderVisible: false },
+    timeScale: { borderVisible: false }
+  });
+  const series = chart.addCandlestickSeries();
+
+  const showLoading = (on) => loading.classList.toggle('d-none', !on);
+
+  async function loadQuote() {
+    try {
+      const r = await fetch(`/api/quote?symbol=${encodeURIComponent(symbol)}&_=${Date.now()}`);
+      const j = await r.json();
+      if (j.ok && j.last != null) {
+        const sign = (j.change ?? 0) > 0 ? '+' : '';
+        const pct = (j.changePercent != null) ? ` (${sign}${j.changePercent.toFixed(2)}%)` : '';
+        quoteBox.innerHTML =
+          `<span class="h5 mb-0">${j.last.toFixed(2)}${j.currency ? ' ' + j.currency : ''}</span>
+           <span class="${(j.change ?? 0) >= 0 ? 'text-success' : 'text-danger'} ml-2">
+             ${sign}${(j.change ?? 0).toFixed(2)}${pct}
+           </span>`;
+      } else {
+        quoteBox.textContent = 'Quote unavailable';
+      }
+    } catch {
+      quoteBox.textContent = 'Quote unavailable';
+    }
+  }
+
+  async function loadRange(range) {
+    [...rangeBar.querySelectorAll('button')].forEach(b => {
+      b.classList.toggle('active', b.dataset.range === range);
+    });
+
+    showLoading(true);
+    try {
+      const url = `/api/history?symbol=${encodeURIComponent(symbol)}&range=${encodeURIComponent(range)}&_=${Date.now()}`;
+      const r = await fetch(url);
+      const j = await r.json();
+      const data = Array.isArray(j.data) ? j.data : [];
+      if (data.length) {
+        series.setData(data);
+        if (markers.length) series.setMarkers(markers);
+      } else {
+        series.setData([]); // clear
+      }
+    } catch {
+      series.setData([]);
+    } finally {
+      showLoading(false);
+    }
+  }
+  rangeBar.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-range]');
+    if (!btn) return;
+    loadRange(btn.dataset.range);
+  });
+
+  new ResizeObserver(([entry]) => {
+    const r = entry.contentRect;
+    chart.applyOptions({ width: r.width, height: r.height });
+  }).observe(el);
+
+  loadQuote();
+  loadRange('Month');  
+})();
+</script>
+
+{% endblock %}

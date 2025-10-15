@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% block title %}Closed Positions{% endblock %}
+{% block main %}
+<h4>Closed Positions (FIFO)</h4>
+<table class="table table-sm table-striped">
+    <thead>
+        <tr>
+            <th>Symbol</th><th class="text-right">Qty</th>
+            <th class="text-right">Entry</th><th class="text-right">Exit</th>
+            <th>Opened</th><th>Closed</th><th class="text-right">Days</th>
+            <th class="text-right">P&L $</th><th class="text-right">P&L %</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in rows %}
+        <tr>
+            <td><a href="/symbol/{{r.symbol}}">{{r.symbol}}</a></td>
+                <td class="text-right">{{ r.qty }}</td>
+                <td class="text-right">{{ r.entry_price | usd }}</td>
+                <td class="text-right">{{ r.exit_price  | usd }}</td>
+                <td>{{ r.opened_at }}</td>
+                <td>{{ r.closed_at }}</td>
+                <td class="text-right">{{ r.days }}</td>
+                <td class="text-right">{{ r.pnl | usd }}</td>
+                <td class="text-right">{{ '%.2f'|format(r.pnl_pct) }}%</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="8" class="text-right"><strong>Total realized</strong></td>
+            <td class="text-right"><strong>{{total_realized | usd}}</strong></td>
+        </tr>
+    </tfoot>
+</table>
+{% endblock %}

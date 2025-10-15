@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% block title %}Open Positions{% endblock %}
+{% block main %}
+<div class="d-flex align-items-center mb-2">
+    <h4 class="mb-0">Open Positions</h4>
+    <a class="btn btn-sm btn-primary ml-3" href="/trade">Trade</a>
+</div>
+
+<table class="table table-sm table-striped">
+    <thead>
+        <tr>
+            <th>Symbol</th>
+            <th class="test-right">Shares</th>
+            <th class="test-right">Avg cost</th>
+            <th class="test-right">Last</th>
+            <th class="test-right">Unrealized $</th>
+            <th class="test-right">Unrealized %</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in rows %}
+        <tr>
+            <td><a href="/symbol/{{r.symbol}}">{{r.symbol}}</a></td>
+            <td class="text-right">{{r.shares}}</td>
+            <td class="text-right">{{r.avg_cost | usd}}</td>
+            <td class="text-right">
+                {% if r.unrealized is none %} — {% else %} {{ r.unrealized | usd }} {% endif %}
+            </td>
+             <td class="text-right">
+                {% if r.unrealized_pct is none %} — {% else %} {{ '%.2f'|format(r.unrealized_pct) }}% {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="5" class="text-right"><strong>Total Market Value</strong></td>
+            <td class="text-right"><strong>{{total_value | usd}}</strong></td>
+        </tr>
+    </tfoot>
+</table>
+{% endblock %}
