@@ -1,5 +1,4 @@
 # TRADES WATCHER
-#### Video Demo:  <https://www.youtube.com/watch?v=C4WlNbYu33A>
 #### Description: A lightweight stock-tracking web app that let's users refister/login, recod buy/sell trades, monitor open and closed positions with live quotes, keep a watchlist, and explore interactive charts (1D, 5D, Week, 3M, YTD, 5Y).
 
 ---
